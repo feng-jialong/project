@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<routes>
+	<flow id="EN_S" begin="0" end="86400" vehsPerHour="212" route="EN_S" departLane="random"/>
+	<flow id="EN_W" begin="0" end="86400" vehsPerHour="396" route="EN_W" departLane="random"/>
+	<flow id="EN_N" begin="0" end="86400" vehsPerHour="219" route="EN_N" departLane="random"/>
+	<flow id="EE_S" begin="0" end="86400" vehsPerHour="180" route="EE_S" departLane="random"/>
+	<flow id="EE_W" begin="0" end="86400" vehsPerHour="400" route="EE_W" departLane="random"/>
+	<flow id="EE_N" begin="0" end="86400" vehsPerHour="203" route="EE_N" departLane="random"/>
+	<flow id="ES_S" begin="0" end="86400" vehsPerHour="202" route="ES_S" departLane="random"/>
+	<flow id="ES_W" begin="0" end="86400" vehsPerHour="398" route="ES_W" departLane="random"/>
+	<flow id="ES_N" begin="0" end="86400" vehsPerHour="190" route="ES_N" departLane="random"/>
+	<flow id="SE_W" begin="0" end="86400" vehsPerHour="190" route="SE_W" departLane="random"/>
+	<flow id="SE_N" begin="0" end="86400" vehsPerHour="392" route="SE_N" departLane="random"/>
+	<flow id="SE_E" begin="0" end="86400" vehsPerHour="192" route="SE_E" departLane="random"/>
+	<flow id="SS_W" begin="0" end="86400" vehsPerHour="192" route="SS_W" departLane="random"/>
+	<flow id="SS_N" begin="0" end="86400" vehsPerHour="411" route="SS_N" departLane="random"/>
+	<flow id="SS_E" begin="0" end="86400" vehsPerHour="206" route="SS_E" departLane="random"/>
+	<flow id="SW_W" begin="0" end="86400" vehsPerHour="210" route="SW_W" departLane="random"/>
+	<flow id="SW_N" begin="0" end="86400" vehsPerHour="411" route="SW_N" departLane="random"/>
+	<flow id="SW_E" begin="0" end="86400" vehsPerHour="209" route="SW_E" departLane="random"/>
+	<flow id="WS_N" begin="0" end="86400" vehsPerHour="210" route="WS_N" departLane="random"/>
+	<flow id="WS_E" begin="0" end="86400" vehsPerHour="416" route="WS_E" departLane="random"/>
+	<flow id="WS_S" begin="0" end="86400" vehsPerHour="191" route="WS_S" departLane="random"/>
+	<flow id="WW_N" begin="0" end="86400" vehsPerHour="207" route="WW_N" departLane="random"/>
+	<flow id="WW_E" begin="0" end="86400" vehsPerHour="435" route="WW_E" departLane="random"/>
+	<flow id="WW_S" begin="0" end="86400" vehsPerHour="191" route="WW_S" departLane="random"/>
+	<flow id="WN_N" begin="0" end="86400" vehsPerHour="187" route="WN_N" departLane="random"/>
+	<flow id="WN_E" begin="0" end="86400" vehsPerHour="400" route="WN_E" departLane="random"/>
+	<flow id="WN_S" begin="0" end="86400" vehsPerHour="221" route="WN_S" departLane="random"/>
+	<flow id="NW_E" begin="0" end="86400" vehsPerHour="226" route="NW_E" departLane="random"/>
+	<flow id="NW_S" begin="0" end="86400" vehsPerHour="417" route="NW_S" departLane="random"/>
+	<flow id="NW_W" begin="0" end="86400" vehsPerHour="196" route="NW_W" departLane="random"/>
+	<flow id="NN_E" begin="0" end="86400" vehsPerHour="197" route="NN_E" departLane="random"/>
+	<flow id="NN_S" begin="0" end="86400" vehsPerHour="391" route="NN_S" departLane="random"/>
+	<flow id="NN_W" begin="0" end="86400" vehsPerHour="176" route="NN_W" departLane="random"/>
+	<flow id="NE_E" begin="0" end="86400" vehsPerHour="196" route="NE_E" departLane="random"/>
+	<flow id="NE_S" begin="0" end="86400" vehsPerHour="420" route="NE_S" departLane="random"/>
+	<flow id="NE_W" begin="0" end="86400" vehsPerHour="190" route="NE_W" departLane="random"/>
+</routes>
