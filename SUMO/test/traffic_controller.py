@@ -22,12 +22,9 @@ class BaseTrafficController(TrafficController):
         # NEMA相位
         self.id = 'J'
         
-        r_second = 1.0
-        y_second = 3.0
-        
-        self.r_time = int(r_second/step_length)
-        self.y_time = int(y_second/step_length)
-        
+        self.y_time = int(3.0/step_length)
+        self.r_time = int(1.0/step_length)
+
         self.state_num = 16
         # 流向编号映射到信号灯state
         self.state_group = {'0':[0,4,8,12],
@@ -137,14 +134,15 @@ class BaseTrafficController(TrafficController):
         split = 8*[0]
         split[0],split[1] = np.random.uniform(split_min,split_max,2)
         split[4] = np.random.uniform(split_min,split[0]+split[1]-split_min)
-        split[5] = split[0]+split[1]-split[4]
+
         
         split[2],split[3] = np.random.uniform(split_min,split_max,2)
         split[6] = np.random.uniform(split_min,split[2]+split[3]-split_min)
-        split[7] = split[2]+split[3]-split[6]
         
         # 转变为步长
-        split = [int(t/self.step_length) for t in split]
+        split = [int(t/self.step_length) for t in split]  # 先取整，保证barrier约束成立
+        split[5] = split[0]+split[1]-split[4]
+        split[7] = split[2]+split[3]-split[6]
         control['split'] = split
         
         # 信号相关：五个0-1变量确定环内流向顺序，六个连续变量确定相位分隔
