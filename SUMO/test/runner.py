@@ -4,9 +4,9 @@ import os,sys
 import xml.etree.ElementTree as et
 from xml.dom import minidom
 import numpy as np
-from itertools import cycle
 import pickle
 from tqdm import tqdm
+import importlib as imp
 
 # check environment varialble 'SUMO_HOME'
 if 'SUMO_HOME' in os.environ:
@@ -18,229 +18,19 @@ else:
 
 import traci
 from traci import vehicle
-from traci import edge
 from traci import lane
-from traci import trafficlight
 from traci import multientryexit
-from traci import route
 from traci import junction
 from traci import constants
+
+import traffic_controller
+try:
+    imp.reload(traffic_controller)
+except:
+    pass
+from traffic_controller import BaseTrafficController
+
 # endregion
-
-#%% 信号控制器
-class TrafficController():
-    def __init__(self,id):
-        self.id = id # controller所控制trafficlight的id
-        self.phase_time = 0.0 # 当前相位剩下的时间
-    
-    def update(self):
-        pass
-    
-    def next_phase(self):
-        pass
-    
-    def controll(self):
-        pass
-
-class StaticTSC():
-    def __init__(self,step_length):
-        self.id = 'J'
-        
-        self.r_time = int(1.0/step_length)
-        self.y_time = int(3.0/step_length)
-        
-        self.all_red = 'GrrrGrrrGrrrGrrr'  # 右转车道不受灯控
-        self.phase = self.all_red
-        self.state_num = len(self.all_red)
-        
-        self.step_length = step_length
-        
-        # 对称相位，南北直行左转，东西直行左转
-        self.green_phases = ['GGGrGrrrGGGrGrrr',
-                             'GrrGGrrrGrrGGrrr',
-                             'GrrrGGGrGrrrGGGr',
-                             'GrrrGrrGGrrrGrrG']
-        
-        self.phase_time = 0  # 相位剩余的应用的时间步
-        self.cycle_time = 0  # 周期剩余的应用的时间步
-        
-        # 绿灯时间初始化
-        g_time = [int(d/step_length) for d in [30.0,30.0,30.0,30.0]]
-        self.green_phase_duration = {g:g_time[i] for i,g in enumerate(self.green_phases)}
-        
-    def run(self):
-        # 规划下一步的信号
-        if self.cycle_time == 0:
-            # 周期切换
-            self.next_cycle()
-        if self.phase_time == 0:
-            # 相位切换
-            self.next_phase()
-            trafficlight.setRedYellowGreenState(self.id, self.phase)
-
-        self.phase_time -= 1
-        self.cycle_time -= 1
-    
-    def get_inter_phase(self,phase,next_phase):
-        if phase == next_phase or phase == self.all_red:
-            return []
-        else:
-            yellow_phase = ''.join([ p if p == 'r' else 'y' for p in phase ])
-            return [yellow_phase, self.all_red]
-
-    def next_cycle(self):
-        # 全权负责将控制器的状态推进至下一个周期
-        phase_cycle = []
-        green_phases = self.green_phases
-        next_green_phases = self.green_phases[1:] + [self.green_phases[0]]
-        for g,next_g in zip(green_phases,next_green_phases):
-            phase_cycle.append(g)
-            phase_cycle.extend(self.get_inter_phase(g,next_g))
-        self.phase_cycle = cycle(phase_cycle)
-        
-        g_time = [int(d/self.step_length) for d in np.random.uniform(15.0,40.0,4)]
-        self.cycle_time = sum([g + self.y_time + self.r_time for g in g_time])
-        self.green_phase_duration = {g:g_time[i] for i,g in enumerate(self.green_phases)}
-
-    def next_phase(self):
-        # 全权负责将控制器的状态推进至下一个相位
-        self.phase = next(self.phase_cycle)
-        
-        if self.phase in self.green_phases:
-            self.phase_time =  self.green_phase_duration[self.phase]
-        elif 'y' in self.phase:
-            self.phase_time = self.y_time
-        else:
-            self.phase_time = self.r_time
-        
-    def phase_duration(self,phase):
-        if phase in self.green_phases:
-            return self.green_phase_duration[phase]
-        elif 'y' in phase:
-            return self.y_time
-        else:
-            return self.r_time
-    
-    def output(self):
-        # 输出绿灯时间
-        g_time = list(self.green_phase_duration.values())  # 绿灯时间步
-        return [t*self.step_length for t in g_time]
-    
-class WebstersTSC():
-    # 周期级自适应webster信号控制器
-    def __init__(self,id,r_time,y_time,g_min,c_min,c_max):
-        self.id = id
-        
-        self.r_time = r_time  # 红灯时间步
-        self.y_time = y_time  # 黄灯时间步
-        self.g_min = g_min
-        self.c_min = c_min
-        self.c_max = c_max
-        
-        self.movement_state = {'WT':[13,14],'EL':[7],'ST':[9,10],'NL':[3],  # ring1 的四股车流
-                               'ET':[5,6],'WL':[15],'NT':[1,2],'SL':[11],  # ring2 的四股车流
-                               'R':[0,4,8,12]}   # 右转车流
-        
-        # hardcode, 绿灯相位以及对应state
-        self.green_phases = ['GGGrGrrrGGGrGrrr',
-                             'GrrGGrrrGrrGGrrr',
-                             'GrrrGGGrGrrrGGGr',
-                             'GrrrGrrGGrrrGrrG']
-        
-        self.all_red = len((self.green_phases[0]))*'r'
-        
-        self.phase_time = 0  # 相位剩余的时间步
-        self.cycle_time = 0  # 周期剩余的时间步
-        self.phase_cycle = self.next_cycle()  # 周期的相位循环
-        self.green_phase_duration = {g:self.g_min for g in self.green_phases}  # 绿灯时长
-    
-    def run(self):
-        if self.cycle_time == 0:
-            # 周期切换
-            self.phase_cycle = self.next_cycle()
-        if self.phase_time == 0:
-            # 相位切换
-            self.phase = next(self.phase_cycle)
-            self.conn.trafficlight.setRedYellowGreenState( self.id, self.phase)
-            self.phase_time = self.next_phase_duration()
-
-        self.phase_time -= 1
-        self.cycle_time -= 1
-    
-    def next_phase(self):
-        return next(self.phase_cycle)
-    
-    def next_phase_duration(self):
-        if self.phase in self.green_phases:
-            return self.green_phase_duration[self.phase]
-        elif 'y' in self.phase:
-            return self.y_time
-        else:
-            return self.r_time
-        
-    def next_cycle(self):
-        phase_cycle = []
-        green_phases = self.green_phases
-        next_green_phases = self.green_phases[1:] + [self.green_phases[0]]
-        for g,next_g in zip(green_phases,next_green_phases):
-            phase_cycle.append(g)
-            phase_cycle.extend(self.get_inter_phase(self,g,next_g))
-        return phase_cycle
-    
-    def update(self):
-        pass
-    
-    def get_inter_phase(self,phase,next_phase):
-        if phase == next_phase or phase == self.all_red:
-            return []
-        else:
-            yellow_phase = ''.join([ p if p == 'r' else 'y' for p in phase ])
-            return [yellow_phase, self.all_red]
-    
-    def webster(self):
-        """update green phase times using lane
-        vehicle counts and Websters' traffic signal
-        control method
-        """
-        ##compute flow ratios for all lanes in all green phases
-        ##find critical
-        y_crit = []
-        for g in self.green_phases:
-            sat_flows = [(self.phase_lane_counts[g][l]/self.update_freq)/(self.sat_flow) for l in self.phase_lanes[g]]
-            y_crit.append(max(sat_flows))
-
-        #compute intersection critical lane flow rattios
-        Y = sum(y_crit)
-        if Y > 0.85:
-            Y = 0.85
-        elif Y == 0.0:
-            Y = 0.01
-
-        #limit in case too saturated
-        #compute lost time
-        L = len(self.green_phases)*(self.red_t + self.yellow_t)
-
-        #compute cycle time
-        C = int(((1.5*L) + 5)/(1.0-Y))
-        #constrain if necessary
-        if C > self.c_max:
-            C = self.c_max
-        elif C < self.c_min:
-            C = self.c_min
-
-        G = C - L
-        #compute green times for each movement
-        #based on total green times
-        for g, y in zip(self.green_phases, y_crit):
-            g_t = int((y/Y)*G)
-            #constrain green phase time if necessary
-            if g_t < self.g_min:
-                g_t = self.g_min
-            self.green_phase_duration[g] = g_t
-
-    def movement_state(self):
-        # hardcode
-        pass
 
 #%%
 # 根据车辆的路径id获取转向
@@ -347,39 +137,7 @@ class Observer():
         
         self.inlet_index = {'W':0,'N':1,'E':2,'S':3}
     
-    '''
-    def observe_process(self):
-        obs_speed = np.zeros((4,self.grid_num,self.lane_div*self.lane_num),dtype=np.float16)
-        obs_move = np.zeros((4,self.grid_num,self.lane_div*self.lane_num),dtype='<U1')
-        
-        vehicle_info = junction.getContextSubscriptionResults(self.id)
-        for vehicle_id in vehicle_info:
-            lane_id = vehicle.getLaneID(vehicle_id)
-            if lane_id[0] == ':':  # 排除越过停车线的交叉口中车辆，主要为不受信控的右转车
-                continue
-            if lane_id[2] == 'O':  # 排除交叉口附近正在离开的车辆
-                continue
-            inlet_index = self.inlet_index[lane_id[0]]
-            lane_index = int(lane_id[-1])
-
-            if lane_id[-3] == 'P':
-                grid_index = (lane.getLength(lane_id) - (vehicle.getLanePosition(vehicle_id) - vehicle.getLength(vehicle_id)))//self.grid_length
-                grid_index = int(grid_index)
-            else:
-                grid_index = lane.getLength(lane_id) - (vehicle.getLanePosition(vehicle_id) - vehicle.getLength(vehicle_id))
-                grid_index += lane.getLength(lane_id[:5] + 'P_' + lane_id[-1])
-                grid_index = grid_index//self.grid_length
-                grid_index = int(grid_index)
-            
-            obs_speed[inlet_index,grid_index,
-                      self.lane_num-lane_index-1] = vehicle.getSpeed(vehicle_id)
-            obs_move[inlet_index,grid_index,
-                     self.lane_num-lane_index-1] = get_movement(vehicle_id)
-            
-        return [obs_speed,obs_move]
-    '''
-    
-    def observe(self):
+    def output(self):
         obs = []
         
         vehicle_info = junction.getContextSubscriptionResults(self.id)
@@ -415,15 +173,15 @@ class Observer():
 
 #%% interaction between server and client
 def run(number,step_length,mode='single',cycle_to_run=1):
-    step_cycle = 0
+    cycle_step = 0
     
     delay_monitor = DelayMonitor()
     observer = Observer()
-    tsc = StaticTSC(step_length)
+    tc = BaseTrafficController(step_length)
     
     obs_list = []  # 记录观测数据
     delay_list = []  # 记录延误数据
-    ts_list = []  # 记录信号控制数据
+    tc_list = []  # 记录信号控制数据
 
     warm_up = 4   # 热启动需要的周期数  # 可能需要敏感性分析
     
@@ -435,43 +193,43 @@ def run(number,step_length,mode='single',cycle_to_run=1):
     pbar = tqdm(total=cycle_to_run+warm_up,desc=f"simulation {number}")
     
     # 按周期数进行仿真
-    while(step_cycle<=warm_up+cycle_to_run):
+    while(cycle_step<=warm_up+cycle_to_run):
         # 规划下一步
-        tsc.run()
+        tc.run()
         # 仿真进一步
         traci.simulationStep()
 
         # 处理上一步
         delay_monitor.update()
         # 周期即将切换时进行的处理
-        if tsc.cycle_time == 0:
-            obs_list.append(observer.observe())  # 下一周期的观测
+        if tc.cycle_time == 0:
+            obs_list.append(observer.output())  # 下一周期的观测
             delay_list.append(delay_monitor.output())  # 上一周期的延误
-            ts_list.append(tsc.output())   # 上一周期的信号控制
-            step_cycle += 1
+            tc_list.append(tc.output())   # 上一周期的信号控制
+            cycle_step += 1
             pbar.update(1)
     
     # 热启动，以及观测和延误的对齐
     obs_list = obs_list[warm_up:-1]
     delay_list = delay_list[warm_up+1:]
-    ts_list = ts_list[warm_up+1:]
+    tc_list = tc_list[warm_up+1:]
     
     # 数据收集模式，单周期数据，连续多周期数据
     if mode=='single':
         obs_list = obs_list[-1]
         delay_list = delay_list[-1]
-        ts_list = ts_list[-1]
+        tc_list = tc_list[-1]
     if mode=='multiple':
         pass
     
     # 结束仿真
     traci.close()
     
-    return (obs_list,delay_list,ts_list)
+    return (obs_list,delay_list,tc_list)
 
 #%% 
-step_length = 0.4  # 敏感性分析
-sumocfg = ["sumo",
+step_length = 0.5  # 敏感性分析
+sumocfg = ["sumo-gui",
             "--route-files","test.rou.xml,flow.rou.xml",
             "--net-file","test.net.xml",
             "--additional-files","test.e3.xml",
@@ -484,7 +242,7 @@ data_dir = '../../data/synthetic_data/'
 def single_cycle_simulate(runs,data_name):
     obs_data = []
     delay_data = []
-    ts_data = []
+    tc_data = []
     demand_data = []
 
     for i in range(runs):  # 运行多次仿真，收集数据
@@ -496,18 +254,18 @@ def single_cycle_simulate(runs,data_name):
             pass
         traci.start(sumocfg,port=666)
         
-        obs,delay,ts = run(i,step_length,mode='single')
+        obs,delay,tc = run(i,step_length,mode='single')
         
         obs_data.append(obs)
         delay_data.append(delay)
-        ts_data.append(ts)
+        tc_data.append(tc)
 
-    data = {'obs':obs_data,'delay':delay_data,'ts':ts_data,'demand':demand_data}
+    data = {'obs':obs_data,'delay':delay_data,'tc':tc_data,'demand':demand_data}
 
     # data dimension description
     # obs: (list:sample, list:obs_vehicle, dict:vehicle_info)
     # delay：(list:sample)
-    # ts：(list:sample, list:timing params)
+    # tc：(list:sample, list:timing params)
     # demand：(list:sample, list:route)
 
 
@@ -521,7 +279,7 @@ def single_cycle_simulate(runs,data_name):
 def multiple_cycle_simulate(runs,cycle_to_run,data_name):
     obs_data = []
     delay_data = []
-    ts_data = []
+    tc_data = []
     demand_data = []
 
     for i in range(runs):  # 运行多次仿真，收集数据
@@ -533,18 +291,18 @@ def multiple_cycle_simulate(runs,cycle_to_run,data_name):
             pass
         traci.start(sumocfg,port=666)
         
-        obs,delay,ts = run(i,step_length,mode='multiple',cycle_to_run=cycle_to_run)
+        obs,delay,tc = run(i,step_length,mode='multiple',cycle_to_run=cycle_to_run)
         
         obs_data.append(obs)
         delay_data.append(delay)
-        ts_data.append(ts)
+        tc_data.append(tc)
 
-    data = {'obs':obs_data,'delay':delay_data,'ts':ts_data,'demand':demand_data}
+    data = {'obs':obs_data,'delay':delay_data,'tc':tc_data,'demand':demand_data}
 
     # data dimension description
     # obs: (list:sample, list:cycle, list:obs_vehicle, dict:vehicle_info)
     # delay：(list:sample, list:cycle)
-    # ts：(list:sample, list:cycle, list:timing params)
+    # tc：(list:sample, list:cycle, list:timing params)
     # demand：(list:sample, list:cycle, list:route)
 
     # 保存
@@ -557,4 +315,4 @@ def multiple_cycle_simulate(runs,cycle_to_run,data_name):
 
 #%%
 # multiple_cycle_simulate(250,20,'multiple_cycle_3')
-single_cycle_simulate(1400,'single_cycle_2')
+single_cycle_simulate(1,'test')

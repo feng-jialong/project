@@ -3,3 +3,5 @@ results
 __pycache__
 .vscode
 reference
+SUMO/test/flow.rou.xml
+SUMO/test/testDLA
