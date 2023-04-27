@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2023-03-31 19:50:20 by Eclipse SUMO netedit Version 1.14.1
+<!-- generated on 2023-04-27 13:58:21 by Eclipse SUMO netedit Version 1.14.1
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
@@ -28,10 +28,6 @@
     <pedestrian>
         <walkingareas value="false"/>
     </pedestrian>
-
-    <netedit>
-        <additional-files value="P:\学校相关\第八学期\毕业设计\project\SUMO\test\test.det.xml"/>
-    </netedit>
 
 </configuration>
 -->
@@ -464,10 +460,10 @@
         <lane id="E_IN_3" index="3" speed="13.89" length="533.20" shape="583.20,1.60 50.00,1.60"/>
     </edge>
     <edge id="E_IN_P" from="J2" to="J" priority="-1">
-        <lane id="E_IN_P_0" index="0" speed="13.89" length="33.20" shape="50.00,11.20 16.80,11.20"/>
-        <lane id="E_IN_P_1" index="1" speed="13.89" length="33.20" shape="50.00,8.00 16.80,8.00"/>
-        <lane id="E_IN_P_2" index="2" speed="13.89" length="33.20" shape="50.00,4.80 16.80,4.80"/>
-        <lane id="E_IN_P_3" index="3" speed="13.89" length="33.20" shape="50.00,1.60 16.80,1.60"/>
+        <lane id="E_IN_P_0" index="0" speed="13.89" length="33.20" shape="50.00,11.20 16.80,11.20" changeLeft="custom1 custom2" changeRight="custom1 custom2"/>
+        <lane id="E_IN_P_1" index="1" speed="13.89" length="33.20" shape="50.00,8.00 16.80,8.00" changeLeft="custom1 custom2" changeRight="custom1 custom2"/>
+        <lane id="E_IN_P_2" index="2" speed="13.89" length="33.20" shape="50.00,4.80 16.80,4.80" changeLeft="custom1 custom2" changeRight="custom1 custom2"/>
+        <lane id="E_IN_P_3" index="3" speed="13.89" length="33.20" shape="50.00,1.60 16.80,1.60" changeLeft="custom1 custom2" changeRight="custom1 custom2"/>
     </edge>
     <edge id="E_OUT" from="J" to="E" priority="-1">
         <lane id="E_OUT_0" index="0" speed="13.89" length="566.40" shape="16.80,-11.20 583.20,-11.20"/>
@@ -482,10 +478,10 @@
         <lane id="N_IN_3" index="3" speed="13.89" length="533.20" shape="-1.60,583.20 -1.60,50.00"/>
     </edge>
     <edge id="N_IN_P" from="J1" to="J" priority="-1">
-        <lane id="N_IN_P_0" index="0" speed="13.89" length="33.20" shape="-11.20,50.00 -11.20,16.80"/>
-        <lane id="N_IN_P_1" index="1" speed="13.89" length="33.20" shape="-8.00,50.00 -8.00,16.80"/>
-        <lane id="N_IN_P_2" index="2" speed="13.89" length="33.20" shape="-4.80,50.00 -4.80,16.80"/>
-        <lane id="N_IN_P_3" index="3" speed="13.89" length="33.20" shape="-1.60,50.00 -1.60,16.80"/>
+        <lane id="N_IN_P_0" index="0" speed="13.89" length="33.20" shape="-11.20,50.00 -11.20,16.80" changeLeft="custom1 custom2" changeRight="custom1 custom2"/>
+        <lane id="N_IN_P_1" index="1" speed="13.89" length="33.20" shape="-8.00,50.00 -8.00,16.80" changeLeft="custom1 custom2" changeRight="custom1 custom2"/>
+        <lane id="N_IN_P_2" index="2" speed="13.89" length="33.20" shape="-4.80,50.00 -4.80,16.80" changeLeft="custom1 custom2" changeRight="custom1 custom2"/>
+        <lane id="N_IN_P_3" index="3" speed="13.89" length="33.20" shape="-1.60,50.00 -1.60,16.80" changeLeft="custom1 custom2" changeRight="custom1 custom2"/>
     </edge>
     <edge id="N_OUT" from="J" to="N" priority="-1">
         <lane id="N_OUT_0" index="0" speed="13.89" length="566.40" shape="11.20,16.80 11.20,583.20"/>
@@ -500,10 +496,10 @@
         <lane id="S_IN_3" index="3" speed="13.89" length="533.20" shape="1.60,-583.20 1.60,-50.00"/>
     </edge>
     <edge id="S_IN_P" from="J3" to="J" priority="-1">
-        <lane id="S_IN_P_0" index="0" speed="13.89" length="33.20" shape="11.20,-50.00 11.20,-16.80"/>
-        <lane id="S_IN_P_1" index="1" speed="13.89" length="33.20" shape="8.00,-50.00 8.00,-16.80"/>
-        <lane id="S_IN_P_2" index="2" speed="13.89" length="33.20" shape="4.80,-50.00 4.80,-16.80"/>
-        <lane id="S_IN_P_3" index="3" speed="13.89" length="33.20" shape="1.60,-50.00 1.60,-16.80"/>
+        <lane id="S_IN_P_0" index="0" speed="13.89" length="33.20" shape="11.20,-50.00 11.20,-16.80" changeLeft="custom1 custom2" changeRight="custom1 custom2"/>
+        <lane id="S_IN_P_1" index="1" speed="13.89" length="33.20" shape="8.00,-50.00 8.00,-16.80" changeLeft="custom1 custom2" changeRight="custom1 custom2"/>
+        <lane id="S_IN_P_2" index="2" speed="13.89" length="33.20" shape="4.80,-50.00 4.80,-16.80" changeLeft="custom1 custom2" changeRight="custom1 custom2"/>
+        <lane id="S_IN_P_3" index="3" speed="13.89" length="33.20" shape="1.60,-50.00 1.60,-16.80" changeLeft="custom1 custom2" changeRight="custom1 custom2"/>
     </edge>
     <edge id="S_OUT" from="J" to="S" priority="-1">
         <lane id="S_OUT_0" index="0" speed="13.89" length="566.40" shape="-11.20,-16.80 -11.20,-583.20"/>
@@ -518,10 +514,10 @@
         <lane id="W_IN_3" index="3" speed="13.89" length="533.20" shape="-583.20,-1.60 -50.00,-1.60"/>
     </edge>
     <edge id="W_IN_P" from="J0" to="J" priority="-1" length="50.00">
-        <lane id="W_IN_P_0" index="0" speed="13.89" length="50.00" shape="-50.00,-11.20 -16.80,-11.20"/>
-        <lane id="W_IN_P_1" index="1" speed="13.89" length="50.00" shape="-50.00,-8.00 -16.80,-8.00"/>
-        <lane id="W_IN_P_2" index="2" speed="13.89" length="50.00" shape="-50.00,-4.80 -16.80,-4.80"/>
-        <lane id="W_IN_P_3" index="3" speed="13.89" length="50.00" shape="-50.00,-1.60 -16.80,-1.60"/>
+        <lane id="W_IN_P_0" index="0" speed="13.89" length="50.00" shape="-50.00,-11.20 -16.80,-11.20" changeLeft="custom1 custom2" changeRight="custom1 custom2"/>
+        <lane id="W_IN_P_1" index="1" speed="13.89" length="50.00" shape="-50.00,-8.00 -16.80,-8.00" changeLeft="custom1 custom2" changeRight="custom1 custom2"/>
+        <lane id="W_IN_P_2" index="2" speed="13.89" length="50.00" shape="-50.00,-4.80 -16.80,-4.80" changeLeft="custom1 custom2" changeRight="custom1 custom2"/>
+        <lane id="W_IN_P_3" index="3" speed="13.89" length="50.00" shape="-50.00,-1.60 -16.80,-1.60" changeLeft="custom1 custom2" changeRight="custom1 custom2"/>
     </edge>
     <edge id="W_OUT" from="J" to="W" priority="-1">
         <lane id="W_OUT_0" index="0" speed="13.89" length="566.40" shape="-16.80,11.20 -583.20,11.20"/>
