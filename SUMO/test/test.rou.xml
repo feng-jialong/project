@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2023-03-30 21:06:53 by Eclipse SUMO netedit Version 1.14.1
+<!-- generated on 2023-05-07 15:09:47 by Eclipse SUMO netedit Version 1.14.1
 -->
 
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">
+    <!-- VTypes -->
+    <vType id="LEFT" color="red" lcOvertakeDeltaSpeedFactor="0.5" speedFactor="normc(1,0.1,0.2,2)"/>
+    <vType id="RIGHT" color="blue" lcOvertakeDeltaSpeedFactor="0.5" speedFactor="normc(1,0.1,0.2,2)"/>
+    <vType id="THROUGH" color="green" lcOvertakeDeltaSpeedFactor="0.5" speedFactor="normc(1,0.1,0.2,2)"/>
     <!-- Routes -->
     <route id="EE_N" edges="-E8 E_IN E_IN_P N_OUT"/>
     <route id="EE_S" edges="-E8 E_IN E_IN_P S_OUT"/>
